@@ -1,18 +1,7 @@
-## ADDED Requirements
-
-### Requirement: Stats API route handler
-The web app SHALL expose a `GET /api/stats` route handler that calls the shared `fetchNetworkStats()` function and returns the result as JSON.
-
-#### Scenario: Successful response
-- **WHEN** a GET request is made to `/api/stats`
-- **THEN** the response SHALL be a JSON object with HTTP 200 containing all `NetworkStats` fields
-
-#### Scenario: Upstream API failure
-- **WHEN** the shared `fetchNetworkStats()` throws an error
-- **THEN** the route handler SHALL return HTTP 500 with a JSON error message
+## MODIFIED Requirements
 
 ### Requirement: Network stats display component
-The web app SHALL display live ICP network statistics on the landing page using a client component that fetches data via TanStack Query.
+The web app SHALL display live ICP network statistics on the landing page using a client component that fetches data via TanStack Query. The landing page SHALL also include the chat interface component below the stats grid.
 
 #### Scenario: Stats loaded successfully
 - **WHEN** the page loads and the `/api/stats` endpoint returns data
@@ -26,9 +15,6 @@ The web app SHALL display live ICP network statistics on the landing page using 
 - **WHEN** the `/api/stats` endpoint returns an error
 - **THEN** an error message SHALL be displayed to the user
 
-### Requirement: TanStack Query provider
-The web app SHALL wrap the component tree with a `QueryClientProvider` so that `useQuery` hooks function correctly.
-
-#### Scenario: Provider configured
-- **WHEN** the app renders
-- **THEN** TanStack Query's `QueryClientProvider` SHALL be present in the component tree above any components using `useQuery`
+#### Scenario: Chat interface present
+- **WHEN** the landing page renders
+- **THEN** the chat interface component SHALL be visible below the stats grid

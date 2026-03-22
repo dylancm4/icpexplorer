@@ -22,4 +22,4 @@
 - [x] 4.1 Run `npm run build` (all packages build)
 - [x] 4.2 Run `npm run lint` (Biome passes)
 - [x] 4.3 Run `npm test` (Vitest passes)
-- [ ] 4.4 Verify chat works in dev mode: ask "How many nodes are running?" and confirm Claude uses tools to answer
+- [x] 4.4 Verify chat works in dev mode: ask "How many nodes are running?" and confirm Claude uses tools to answer
