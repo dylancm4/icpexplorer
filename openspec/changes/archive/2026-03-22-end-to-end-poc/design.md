@@ -36,8 +36,8 @@ The Metrics API (`metrics-api.internetcomputer.org`) is preferred over the IC AP
 Response formats vary by endpoint (verified via live API calls):
 
 - **Time-series endpoints** (`ic-node-count`, `registered-canisters-count`, `ic-subnet-total`) return `{ key: [[timestamp_number, "value_string"], ...] }` — take the last entry, parse value to number.
-- **`average-cycle-burn-rate`** returns `{ average_cycle_burn_rate: ["timestamp_string", "value_string"] }` — a single flat pair, not a nested array.
-- **`governance-metrics`** returns `{ metrics: [{ name: string, subsets: [{ metric: {...}, value: ["timestamp_string", "value_string"] }] }] }` — 81+ named metrics. For the POC we extract `governance_neurons_total` and `governance_proposals_total` by name.
+- **`average-cycle-burn-rate`** returns `{ average_cycle_burn_rate: [timestamp_number, "value_string"] }` — a single flat pair, not a nested array. Timestamp is a number, not a string.
+- **`governance-metrics`** returns `{ metrics: [{ name: string, subsets: [{ metric: {...}, value: [timestamp_number, "value_string"] }] }] }` — 81+ named metrics. Timestamps are numbers. For the POC we extract `governance_neurons_total` and `governance_proposals_total` by name.
 - **All numeric values are strings** and must be parsed to numbers. Some counts (e.g., `registered-canisters-count`) return interpolated floats — round to integers for display.
 
 **Rationale:** REST is simpler than canister queries for a POC. No SDK initialization, no Candid encoding, no agent setup. The Metrics API provides everything we need for a compelling stats display.

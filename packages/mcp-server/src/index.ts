@@ -9,6 +9,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { registerGetNetworkStats } from "./tools/get-network-stats.js";
 
 /** MCP server instance configured for ICP Explorer. */
 const server = new McpServer({
@@ -31,6 +32,8 @@ server.registerTool(
     };
   },
 );
+
+registerGetNetworkStats(server);
 
 /**
  * Bootstraps the MCP server by binding it to a stdio transport.

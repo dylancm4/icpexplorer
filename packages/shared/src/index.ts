@@ -8,5 +8,11 @@
  * never published to npm.
  */
 
-/** Canonical npm package name for this shared library. */
-export const PACKAGE_NAME = "@icpexplorer/shared";
+export { fetchNetworkStats } from "./api/metrics";
+export {
+  cycleBurnRateResponseSchema,
+  governanceMetricsResponseSchema,
+  networkStatsSchema,
+  timeSeriesEntrySchema,
+} from "./schemas";
+export type { NetworkStats } from "./types";
