@@ -16,6 +16,17 @@ import { z } from "zod";
 export const timeSeriesEntrySchema = z.tuple([z.number(), z.string()]);
 
 /**
+ * Schema for a parsed time-series data point.
+ *
+ * Represents the validated output after converting raw API tuples
+ * `[timestamp_number, "value_string"]` into structured objects.
+ */
+export const timeSeriesPointSchema = z.object({
+  timestamp: z.number(),
+  value: z.number(),
+});
+
+/**
  * Schema for the `average-cycle-burn-rate` endpoint.
  *
  * Response shape: `{ average_cycle_burn_rate: [timestamp_number, "value_string"] }`

@@ -4,6 +4,7 @@ research/
 # Node
 node_modules/
 dist/
+*.tsbuildinfo
 
 # Next.js
 .next/

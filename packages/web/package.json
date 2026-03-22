@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.63",
+    "@ai-sdk/react": "^3.0.136",
     "@icpexplorer/shared": "*",
     "@tanstack/react-query": "^5.95.0",
     "ai": "^6.0.134",

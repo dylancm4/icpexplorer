@@ -1,13 +1,14 @@
 /**
  * Landing page for the ICP Explorer web playground.
  *
- * Renders a hero section with live ICP network statistics.
- * The `NetworkStatsDisplay` is a client component that fetches
- * data via TanStack Query from the `/api/stats` route handler.
+ * Renders a hero section with live ICP network statistics and
+ * an AI chat interface for querying network data conversationally.
  */
 
+import { Chat } from "./components/chat";
 import { NetworkStatsDisplay } from "./components/network-stats";
 
+/** Renders the landing page with network stats and AI chat. */
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
@@ -18,6 +19,7 @@ export default function Home() {
         </p>
       </div>
       <NetworkStatsDisplay />
+      <Chat />
     </main>
   );
 }

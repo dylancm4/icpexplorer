@@ -11,10 +11,40 @@ import {
   networkStatsSchema,
   timeSeriesEntrySchema,
 } from "../schemas";
-import type { NetworkStats } from "../types";
+import type { NetworkStats, TimeSeriesData } from "../types";
 
 /** Base URL for the ICP Metrics API. */
 const BASE_URL = "https://metrics-api.internetcomputer.org/api/v1";
+
+/** Supported time-series metric names. */
+export type TimeSeriesMetric =
+  | "ic-node-count"
+  | "registered-canisters-count"
+  | "ic-subnet-total"
+  | "cycle-burn-rate";
+
+/**
+ * Maps each time-series endpoint to the response keys it returns.
+ *
+ * Multi-key endpoints (e.g., `ic-node-count`) return multiple arrays
+ * under different keys in a single response object.
+ */
+const METRIC_KEYS: Record<TimeSeriesMetric, string[]> = {
+  "ic-node-count": ["total_nodes", "up_nodes"],
+  "registered-canisters-count": ["running_canisters", "stopped_canisters"],
+  "ic-subnet-total": ["ic_subnet_total"],
+  "cycle-burn-rate": ["cycle_burn_rate"],
+};
+
+/** Optional parameters for controlling time-series query range. */
+export interface TimeSeriesOptions {
+  /** Start of the time range as a Unix timestamp in seconds. */
+  start?: number;
+  /** End of the time range as a Unix timestamp in seconds. */
+  end?: number;
+  /** Step interval in seconds (1–259200). */
+  step?: number;
+}
 
 /**
  * Fetches a JSON response from the Metrics API.
@@ -118,4 +148,50 @@ export async function fetchNetworkStats(): Promise<NetworkStats> {
   };
 
   return networkStatsSchema.parse(stats);
+}
+
+/**
+ * Fetches historical time-series data for a specific metric from the Metrics API.
+ *
+ * Returns a `TimeSeriesData` object mapping response keys to arrays of parsed
+ * data points. Multi-key endpoints (e.g., `ic-node-count`) return multiple keys.
+ *
+ * @param metric - The metric endpoint to query.
+ * @param options - Optional time-range parameters (`start`, `end`, `step`).
+ * @returns A `TimeSeriesData` object with parsed time-series points.
+ * @throws If the metric is unsupported, the API is unreachable, or the response is malformed.
+ */
+export async function fetchTimeSeries(
+  metric: TimeSeriesMetric,
+  options?: TimeSeriesOptions,
+): Promise<TimeSeriesData> {
+  const keys = METRIC_KEYS[metric];
+  if (!keys) {
+    throw new Error(`Unsupported time-series metric: "${metric}"`);
+  }
+
+  const params = new URLSearchParams();
+  if (options?.start !== undefined) params.set("start", String(options.start));
+  if (options?.end !== undefined) params.set("end", String(options.end));
+  if (options?.step !== undefined) params.set("step", String(options.step));
+
+  const query = params.toString();
+  const path = `/${metric}${query ? `?${query}` : ""}`;
+  const data = await fetchMetrics(path);
+
+  const obj = data as Record<string, unknown[]>;
+  const result: TimeSeriesData = {};
+
+  for (const key of keys) {
+    const entries = obj[key];
+    if (!entries || entries.length === 0) {
+      throw new Error(`No data found for time-series key "${key}"`);
+    }
+    result[key] = entries.map((entry) => {
+      const parsed = timeSeriesEntrySchema.parse(entry);
+      return { timestamp: parsed[0], value: Number.parseFloat(parsed[1]) };
+    });
+  }
+
+  return result;
 }

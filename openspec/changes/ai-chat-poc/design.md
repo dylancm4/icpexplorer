@@ -52,7 +52,17 @@ packages/shared/src/
   api/metrics.ts              — add fetchTimeSeries() function
 ```
 
-`fetchTimeSeries(metric, options?)` fetches a specific metric's time-series data from the Metrics API. Supported metrics: `ic-node-count`, `registered-canisters-count`, `ic-subnet-total`, `average-cycle-burn-rate`. Returns the full array of `[timestamp, value]` pairs, parsed to `TimeSeriesPoint[]`.
+`fetchTimeSeries(metric, options?)` fetches a specific metric's time-series data from the Metrics API. Supported metrics: `ic-node-count`, `registered-canisters-count`, `ic-subnet-total`, `cycle-burn-rate`. All four endpoints accept `start`, `end` (optional), and `step` query parameters for controlling the time range and resolution.
+
+Returns `TimeSeriesData` (`Record<string, TimeSeriesPoint[]>`) — a map of response keys to parsed data points. Multi-key endpoints (e.g., `ic-node-count` returns both `total_nodes` and `up_nodes`) are preserved as separate keys.
+
+Metric-to-key mapping:
+- `ic-node-count` → `total_nodes`, `up_nodes`
+- `registered-canisters-count` → `running_canisters`, `stopped_canisters`
+- `ic-subnet-total` → `ic_subnet_total`
+- `cycle-burn-rate` → `cycle_burn_rate`
+
+Note: `average-cycle-burn-rate` is a separate endpoint that returns only a single flat pair `[string, string]` — NOT a time-series array. It is used by `fetchNetworkStats()` for the current snapshot but is NOT suitable for `fetchTimeSeries()`. The `cycle-burn-rate` endpoint returns proper time-series arrays `[[number, string], ...]`.
 
 **Rationale:** This reuses the existing Metrics API integration and provides Claude with historical data. The function is generic enough to support any time-series endpoint.
 

@@ -8,11 +8,13 @@
  * never published to npm.
  */
 
-export { fetchNetworkStats } from "./api/metrics";
+export type { TimeSeriesMetric, TimeSeriesOptions } from "./api/metrics";
+export { fetchNetworkStats, fetchTimeSeries } from "./api/metrics";
 export {
   cycleBurnRateResponseSchema,
   governanceMetricsResponseSchema,
   networkStatsSchema,
   timeSeriesEntrySchema,
+  timeSeriesPointSchema,
 } from "./schemas";
-export type { NetworkStats } from "./types";
+export type { NetworkStats, TimeSeriesData, TimeSeriesPoint } from "./types";
