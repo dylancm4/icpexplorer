@@ -1,43 +1,39 @@
-## 1. Project Root Setup
+## 1. Root Configuration
 
-- [ ] 1.1 Create `.gitignore` covering Node, ICP (`.icp/cache/`), build artifacts (`dist/`), and auto-generated files (`routeTree.gen.ts`, `src/backend/api/`)
-- [ ] 1.2 Create `icp.yaml` at project root referencing `backend` and `frontend` canisters, with local network configured for Internet Identity (`ii: true`)
+- [ ] 1.1 Create root `package.json` with npm workspaces pointing to `packages/*`
+- [ ] 1.2 Create `tsconfig.base.json` with shared TypeScript settings (strict, ES2022, NodeNext module resolution)
+- [ ] 1.3 Create `biome.json` with recommended linting and formatting defaults
+- [ ] 1.4 Create `vitest.workspace.ts` referencing all three packages
+- [ ] 1.5 Update `.gitignore` for Node, Next.js (`.next/`), build artifacts (`dist/`), and environment files
 
-## 2. Backend Canister
+## 2. Shared Package
 
-- [ ] 2.1 Create `backend/canister.yaml` with `@dfinity/motoko` recipe pointing to `src/main.mo` and `backend.did`
-- [ ] 2.2 Create `backend/mops.toml` for Motoko package management
-- [ ] 2.3 Create `backend/src/main.mo` with a minimal actor exposing a `greet` function
-- [ ] 2.4 Create `backend/backend.did` Candid interface matching the actor
+- [ ] 2.1 Create `packages/shared/package.json` with name `@icpexplorer/shared`, TypeScript as dev dependency
+- [ ] 2.2 Create `packages/shared/tsconfig.json` extending root base config
+- [ ] 2.3 Create `packages/shared/src/index.ts` with a placeholder export
 
-## 3. Frontend Initialization
+## 3. MCP Server Package
 
-- [ ] 3.1 Initialize Vite + React + TypeScript project in `frontend/app/` with `index.html`, `src/main.tsx`, and TypeScript configs
-- [ ] 3.2 Create `frontend/canister.yaml` with `@dfinity/asset-canister` recipe pointing to `dist/` with build commands
-- [ ] 3.3 Configure `vite.config.ts` with React plugin, `@icp-sdk/bindgen` plugin, and dev server proxy for local canister
-- [ ] 3.4 Create `frontend/app/public/.ic-assets.json5` with SPA aliasing and cache headers
+- [ ] 3.1 Create `packages/mcp-server/package.json` with `@modelcontextprotocol/sdk`, `@icp-sdk/core`, `@icp-sdk/canisters`, `zod` as dependencies, `tsup` as dev dependency, and `@icpexplorer/shared` as workspace dependency
+- [ ] 3.2 Create `packages/mcp-server/tsconfig.json` extending root base config
+- [ ] 3.3 Create `packages/mcp-server/tsup.config.ts` with entry point, ESM output, and DTS generation
+- [ ] 3.4 Create `packages/mcp-server/src/index.ts` with a minimal MCP server that registers a single placeholder tool and supports stdio transport
+- [ ] 3.5 Create `packages/mcp-server/src/tools/` directory with an empty placeholder
 
-## 4. Routing and Data Fetching
+## 4. Web Playground Package
 
-- [ ] 4.1 Install and configure TanStack Router with file-based routing via `@tanstack/router-plugin/vite`
-- [ ] 4.2 Create root layout route in `src/routes/__root.tsx`
-- [ ] 4.3 Create index route in `src/routes/index.tsx` with a minimal landing page
-- [ ] 4.4 Install and configure TanStack Query with `QueryClientProvider` in the app root
+- [ ] 4.1 Initialize Next.js App Router project in `packages/web/` with TypeScript
+- [ ] 4.2 Install and configure Tailwind CSS
+- [ ] 4.3 Initialize shadcn/ui with default style and CSS variables
+- [ ] 4.4 Install Vercel AI SDK (`ai`, `@ai-sdk/anthropic`) and TanStack Query (`@tanstack/react-query`)
+- [ ] 4.5 Add `@icpexplorer/shared` as workspace dependency
+- [ ] 4.6 Configure `next.config.ts` with `transpilePackages: ['@icpexplorer/shared']`
+- [ ] 4.7 Create minimal `src/app/layout.tsx` and `src/app/page.tsx` landing page
 
-## 5. Styling
+## 5. Root Scripts and Integration
 
-- [ ] 5.1 Install and configure Tailwind CSS
-- [ ] 5.2 Initialize shadcn/ui with "new-york" style and CSS variables
-
-## 6. Dev Tooling
-
-- [ ] 6.1 Install Biome and create `biome.json` with recommended linting and formatting defaults
-- [ ] 6.2 Install Vitest and configure it in `vite.config.ts` with jsdom environment
-- [ ] 6.3 Add npm scripts to `package.json`: `dev`, `build`, `preview`, `check`, `format`, `test`
-
-## 7. Verification
-
-- [ ] 7.1 Run `npm run build` in `frontend/app/` and verify production bundle is generated
-- [ ] 7.2 Run `npx biome check` and verify all files pass
-- [ ] 7.3 Run `npx vitest run` and verify test runner works
-- [ ] 7.4 Run `icp build` from project root and verify both canisters build
+- [ ] 5.1 Add root npm scripts: `build`, `dev`, `lint`, `format`, `test` that run across all packages
+- [ ] 5.2 Run `npm install` and verify all workspace dependencies resolve
+- [ ] 5.3 Run `npm run build` and verify all packages build successfully
+- [ ] 5.4 Run `npm run lint` and verify Biome passes
+- [ ] 5.5 Run `npm test` and verify Vitest runs (even with no tests yet)

@@ -1,0 +1,17 @@
+# Research
+research/
+
+# Node
+node_modules/
+dist/
+
+# Next.js
+.next/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
