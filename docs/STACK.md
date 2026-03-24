@@ -6,7 +6,7 @@
 
 - **Language:** TypeScript
 - **Protocol:** `@modelcontextprotocol/sdk` + Zod
-- **ICP SDKs:** `@dfinity/agent`, `@dfinity/nns`, `@dfinity/sns`, `@dfinity/ledger-icp`, `@dfinity/ledger-icrc`, `@dfinity/cmc`
+- **ICP SDKs:** `@icp-sdk/core`, `@icp-sdk/canisters` (replaces deprecated `@dfinity/*` packages)
 - **Build:** tsup (for npm publishing)
 
 ## Web Playground (`packages/web`)
