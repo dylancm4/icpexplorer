@@ -13,7 +13,7 @@ import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
 import { z } from "zod";
 
 /** Builds the system prompt with the current timestamp for relative date calculations. */
-function buildSystemPrompt(): string {
+const buildSystemPrompt = (): string => {
   const now = Math.floor(Date.now() / 1000);
   return `You are an ICP (Internet Computer Protocol) network data assistant. Your role is to answer questions about the ICP network using the tools provided.
 
@@ -37,7 +37,7 @@ Rules:
 - If the user asks something outside your available data, politely explain what you CAN help with and suggest relevant questions they could ask.
 - Present numbers in a human-readable format (e.g., use commas for large numbers).
 - Be concise and factual in your responses.`;
-}
+};
 
 /**
  * Handles POST requests to the chat endpoint.
@@ -45,7 +45,7 @@ Rules:
  * Streams Claude responses with tool use for ICP data queries.
  * Requires `ANTHROPIC_API_KEY` environment variable to be set.
  */
-export async function POST(req: Request) {
+export const POST = async (req: Request) => {
   if (!process.env.ANTHROPIC_API_KEY) {
     return new Response(
       JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured" }),
@@ -125,4 +125,4 @@ export async function POST(req: Request) {
   });
 
   return result.toUIMessageStreamResponse();
-}
+};

@@ -14,7 +14,7 @@ import { NextResponse } from "next/server";
  *
  * @returns HTTP 200 with `NetworkStats` JSON on success, or HTTP 500 with error message.
  */
-export async function GET() {
+export const GET = async () => {
   try {
     const stats = await fetchNetworkStats();
     return NextResponse.json(stats);
@@ -25,4 +25,4 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
+};

@@ -53,7 +53,7 @@ export interface TimeSeriesOptions {
  * @returns The parsed JSON response body.
  * @throws If the network request fails or returns a non-OK status.
  */
-async function fetchMetrics(path: string): Promise<unknown> {
+const fetchMetrics = async (path: string): Promise<unknown> => {
   const response = await fetch(`${BASE_URL}${path}`);
   if (!response.ok) {
     throw new Error(
@@ -61,7 +61,7 @@ async function fetchMetrics(path: string): Promise<unknown> {
     );
   }
   return response.json();
-}
+};
 
 /**
  * Extracts the latest numeric value from a time-series endpoint response.
@@ -73,7 +73,7 @@ async function fetchMetrics(path: string): Promise<unknown> {
  * @param key - The top-level key containing the time-series array.
  * @returns The parsed numeric value from the last entry.
  */
-function extractLatestTimeSeries(data: unknown, key: string): number {
+const extractLatestTimeSeries = (data: unknown, key: string): number => {
   const obj = data as Record<string, unknown[]>;
   const entries = obj[key];
   if (!entries || entries.length === 0) {
@@ -81,7 +81,7 @@ function extractLatestTimeSeries(data: unknown, key: string): number {
   }
   const latest = timeSeriesEntrySchema.parse(entries[entries.length - 1]);
   return Number.parseFloat(latest[1]);
-}
+};
 
 /**
  * Extracts a governance metric value by name from the governance-metrics response.
@@ -90,17 +90,17 @@ function extractLatestTimeSeries(data: unknown, key: string): number {
  * @param name - The metric name to find (e.g. `governance_neurons_total`).
  * @returns The parsed numeric value.
  */
-function extractGovernanceMetric(
+const extractGovernanceMetric = (
   metrics: { name: string; subsets: { value: [number, string] }[] }[],
   name: string,
-): number {
+): number => {
   const metric = metrics.find((m) => m.name === name);
   const subset = metric?.subsets[0];
   if (!subset) {
     throw new Error(`Governance metric "${name}" not found`);
   }
   return Number.parseFloat(subset.value[1]);
-}
+};
 
 /**
  * Fetches live ICP network statistics from the Metrics API.
@@ -111,7 +111,7 @@ function extractGovernanceMetric(
  * @returns A validated `NetworkStats` object with all numeric values parsed.
  * @throws If any API call fails or returns an unexpected response shape.
  */
-export async function fetchNetworkStats(): Promise<NetworkStats> {
+export const fetchNetworkStats = async (): Promise<NetworkStats> => {
   const [nodeData, canisterData, subnetData, burnRateData, governanceData] =
     await Promise.all([
       fetchMetrics("/ic-node-count"),
@@ -148,7 +148,7 @@ export async function fetchNetworkStats(): Promise<NetworkStats> {
   };
 
   return networkStatsSchema.parse(stats);
-}
+};
 
 /**
  * Fetches historical time-series data for a specific metric from the Metrics API.
@@ -161,10 +161,10 @@ export async function fetchNetworkStats(): Promise<NetworkStats> {
  * @returns A `TimeSeriesData` object with parsed time-series points.
  * @throws If the metric is unsupported, the API is unreachable, or the response is malformed.
  */
-export async function fetchTimeSeries(
+export const fetchTimeSeries = async (
   metric: TimeSeriesMetric,
   options?: TimeSeriesOptions,
-): Promise<TimeSeriesData> {
+): Promise<TimeSeriesData> => {
   const keys = METRIC_KEYS[metric];
   if (!keys) {
     throw new Error(`Unsupported time-series metric: "${metric}"`);
@@ -194,4 +194,4 @@ export async function fetchTimeSeries(
   }
 
   return result;
-}
+};

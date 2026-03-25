@@ -13,18 +13,18 @@ import { useQuery } from "@tanstack/react-query";
 /**
  * Fetches network stats from the local API route.
  */
-async function fetchStats(): Promise<NetworkStats> {
+const fetchStats = async (): Promise<NetworkStats> => {
   const response = await fetch("/api/stats");
   if (!response.ok) {
     throw new Error("Failed to fetch stats");
   }
   return response.json();
-}
+};
 
 /**
  * Displays a grid of ICP network statistics with loading and error states.
  */
-export function NetworkStatsDisplay() {
+export const NetworkStatsDisplay = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["network-stats"],
     queryFn: fetchStats,
@@ -81,4 +81,4 @@ export function NetworkStatsDisplay() {
       ))}
     </div>
   );
-}
+};
