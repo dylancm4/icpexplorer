@@ -12,6 +12,12 @@
     "indentStyle": "space",
     "indentWidth": 2
   },
+  "javascript": {
+    "formatter": {
+      "semicolons": "always",
+      "arrowParentheses": "always"
+    }
+  },
   "css": {
     "parser": {
       "tailwindDirectives": true

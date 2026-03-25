@@ -9,14 +9,20 @@
     "dev": "npm run dev --workspaces --if-present",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.8",
-    "vitest": "^4.1.0",
-    "typescript": "^5.9.3"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   },
   "engines": {
     "node": ">=22"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,jsx,json,css}": "biome check --write --no-errors-on-unmatched"
   }
 }
