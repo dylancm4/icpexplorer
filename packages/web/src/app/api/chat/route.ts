@@ -3,14 +3,13 @@
  *
  * Streams Claude responses with tool-calling support for ICP network
  * data queries. Uses Vercel AI SDK v6 `streamText()` with the Anthropic
- * provider and three tools backed by the shared data layer.
+ * provider and MCP-bridged tools from the local MCP server.
  */
 
 import { anthropic } from "@ai-sdk/anthropic";
-import { fetchNetworkStats, fetchTimeSeries } from "@icpexplorer/shared";
 import type { UIMessage } from "ai";
-import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
-import { z } from "zod";
+import { convertToModelMessages, stepCountIs, streamText } from "ai";
+import { getMcpTools } from "@/lib/mcp-client";
 
 /** Builds the system prompt with the current timestamp for relative date calculations. */
 const buildSystemPrompt = (): string => {
@@ -32,8 +31,8 @@ When a user first messages you or asks what you can do, proactively explain the 
 
 Rules:
 - ALWAYS use the provided tools to fetch data before answering questions. Never fabricate or guess network statistics.
-- When asked about current network state, use getNetworkStats or getGovernanceStats.
-- When asked about historical trends or changes over time, use getTimeSeries.
+- When asked about current network state, use get_metrics.
+- When asked about historical trends or changes over time, use get_time_series.
 - If the user asks something outside your available data, politely explain what you CAN help with and suggest relevant questions they could ask.
 - Present numbers in a human-readable format (e.g., use commas for large numbers).
 - Be concise and factual in your responses.`;
@@ -65,62 +64,13 @@ export const POST = async (req: Request) => {
   }
   const modelMessages = await convertToModelMessages(messages);
 
+  const tools = await getMcpTools();
+
   const result = streamText({
     model: anthropic("claude-haiku-4-5"),
     system: buildSystemPrompt(),
     messages: modelMessages,
-    tools: {
-      getNetworkStats: tool({
-        description:
-          "Fetches current ICP network statistics including node count, canister count, subnet count, cycle burn rate, neurons, and proposals.",
-        inputSchema: z.object({}),
-        execute: async () => fetchNetworkStats(),
-      }),
-      getTimeSeries: tool({
-        description:
-          "Fetches historical time-series data for a specific ICP network metric. Always provide start and end timestamps to get meaningful historical data. Returns data points with timestamps and values, keyed by the metric's response fields.",
-        inputSchema: z.object({
-          metric: z
-            .enum([
-              "ic-node-count",
-              "registered-canisters-count",
-              "ic-subnet-total",
-              "cycle-burn-rate",
-            ])
-            .describe(
-              "The metric to query. ic-node-count returns total_nodes and up_nodes. registered-canisters-count returns running_canisters and stopped_canisters. ic-subnet-total returns ic_subnet_total. cycle-burn-rate returns cycle_burn_rate.",
-            ),
-          start: z
-            .number()
-            .describe(
-              "Start of the time range as a Unix timestamp in seconds. For example, 30 days ago.",
-            ),
-          end: z
-            .number()
-            .describe(
-              "End of the time range as a Unix timestamp in seconds. Usually the current time.",
-            ),
-          step: z
-            .number()
-            .optional()
-            .describe(
-              "Step interval in seconds between data points (1–259200). Defaults to a reasonable interval based on the range. Use 86400 for daily points.",
-            ),
-        }),
-        execute: async ({ metric, start, end, step }) => {
-          return fetchTimeSeries(metric, { start, end, step });
-        },
-      }),
-      getGovernanceStats: tool({
-        description:
-          "Fetches current ICP governance statistics: total neurons and total proposals.",
-        inputSchema: z.object({}),
-        execute: async () => {
-          const { totalNeurons, totalProposals } = await fetchNetworkStats();
-          return { totalNeurons, totalProposals };
-        },
-      }),
-    },
+    tools,
     stopWhen: stepCountIs(5),
   });
 

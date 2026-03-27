@@ -13,6 +13,7 @@
 
 - **Framework:** Next.js (App Router)
 - **AI:** `ai` + `@ai-sdk/anthropic` (LLM chat with streaming + tool calls)
+- **MCP Bridge:** `@modelcontextprotocol/sdk` client — spawns the MCP server via stdio and dynamically bridges its tools into the AI SDK chat route
 - **UI:** Tailwind + shadcn/ui
 - **Data Fetching:** TanStack Query (ICP API data)
 

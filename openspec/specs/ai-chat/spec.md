@@ -1,4 +1,4 @@
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Chat API route streams Claude responses with tool use
 The web app SHALL expose a `POST /api/chat` route handler that uses Vercel AI SDK's `streamText()` with the Anthropic provider to stream Claude responses, with tools defined for querying ICP network data.
@@ -15,20 +15,20 @@ The web app SHALL expose a `POST /api/chat` route handler that uses Vercel AI SD
 - **WHEN** the `ANTHROPIC_API_KEY` environment variable is not set
 - **THEN** the route handler SHALL return an error response indicating the API key is missing
 
-### Requirement: Chat tools for ICP data
-The chat route SHALL define three tools using Vercel AI SDK's `tool()` helper:
+### Requirement: Chat route uses AI tools for data queries
+The chat route SHALL consume tools from the MCP server via the client bridge instead of defining AI SDK tools inline. The route SHALL NOT import data-fetching functions from `@icpexplorer/shared` directly.
 
-#### Scenario: getNetworkStats tool
-- **WHEN** Claude calls the `getNetworkStats` tool
-- **THEN** the tool SHALL call `fetchNetworkStats()` from `@icpexplorer/shared` and return the full `NetworkStats` object
+#### Scenario: Chat route uses MCP-bridged tools
+- **WHEN** the chat route initializes its tool set
+- **THEN** it SHALL obtain tools from the MCP client bridge, which dynamically generates AI SDK tools from MCP server metadata
 
-#### Scenario: getTimeSeries tool
-- **WHEN** Claude calls the `getTimeSeries` tool with a `metric` parameter
-- **THEN** the tool SHALL call `fetchTimeSeries()` from `@icpexplorer/shared` with the specified metric and return the time-series data
+#### Scenario: Tool results are returned to the LLM
+- **WHEN** the LLM invokes a tool during a chat conversation
+- **THEN** the tool execution SHALL go through the MCP client bridge to the MCP server and return the result to the LLM for response generation
 
-#### Scenario: getGovernanceStats tool
-- **WHEN** Claude calls the `getGovernanceStats` tool
-- **THEN** the tool SHALL call `fetchNetworkStats()` and return only the governance-related fields (`totalNeurons`, `totalProposals`)
+#### Scenario: User experience is unchanged
+- **WHEN** a user asks a question that previously triggered an inline tool
+- **THEN** the response SHALL contain equivalent data as before the change
 
 ### Requirement: System prompt constrains Claude to ICP data
 The chat route SHALL include a system prompt that instructs Claude to act as an ICP network data assistant, use the provided tools to answer questions, and not fabricate data.

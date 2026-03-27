@@ -12,6 +12,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   transpilePackages: ["@icpexplorer/shared"],
+  serverExternalPackages: [
+    "@icpexplorer/mcp-server",
+    "@modelcontextprotocol/sdk",
+  ],
 };
 
 export default nextConfig;
