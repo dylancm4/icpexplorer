@@ -22,6 +22,9 @@ coverage/
 # Vercel
 .vercel
 
+# Editor
+.vscode/
+
 # OS
 .DS_Store
 
